@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: perfume_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: perfume_root_2024
+      MYSQL_DATABASE: PerfumeRecommendation
+      MYSQL_USER: perfume_user
+      MYSQL_PASSWORD: perfume_pass_2024
+    ports:
+      - '3306:3306'
+    volumes:
+      - perfume_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pperfume_root_2024"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  perfume_data:

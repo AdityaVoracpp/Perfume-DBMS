@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SILLAGE — Perfume Recommendation System</title>
+  <meta name="description" content="Discover and explore perfumes with AI-powered recommendations, advanced filtering, and detailed fragrance profiles." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- ─── Navigation ─── -->
+  <nav class="nav" id="mainNav">
+    <div class="nav__container">
+      <a href="#/" class="nav__logo">
+        <span class="nav__logo-icon">✦</span>
+        <span class="nav__logo-text">SILLAGE</span>
+      </a>
+      <div class="nav__links" id="navLinks">
+        <a href="#/" class="nav__link" data-page="home">Home</a>
+        <a href="#/perfumes" class="nav__link" data-page="perfumes">Perfumes</a>
+        <a href="#/brands" class="nav__link" data-page="brands">Brands</a>
+        <a href="#/notes" class="nav__link" data-page="notes">Notes</a>
+        <a href="#/search" class="nav__link" data-page="search">Search</a>
+        <a href="#/ai" class="nav__link" data-page="ai">
+          <span class="nav__ai-badge">AI</span>
+          ScentAI
+        </a>
+      </div>
+      <div class="nav__auth" id="navAuth">
+        <!-- Filled by JS -->
+      </div>
+      <button class="nav__hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── Main Content ─── -->
+  <main class="main" id="app">
+    <!-- Pages rendered here by router -->
+  </main>
+
+  <!-- ─── Modal Container ─── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContainer">
+      <button class="modal__close" id="modalClose">&times;</button>
+      <div class="modal__content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- ─── Toast Container ─── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ─── Scripts ─── -->
+  <script src="/js/api.js"></script>
+  <script src="/js/components/modal.js"></script>
+  <script src="/js/components/tags.js"></script>
+  <script src="/js/pages/home.js"></script>
+  <script src="/js/pages/perfumes.js"></script>
+  <script src="/js/pages/perfumeDetail.js"></script>
+  <script src="/js/pages/brands.js"></script>
+  <script src="/js/pages/notes.js"></script>
+  <script src="/js/pages/search.js"></script>
+  <script src="/js/pages/auth.js"></script>
+  <script src="/js/pages/ai.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
