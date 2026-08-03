@@ -1,0 +1,25 @@
+{
+  "name": "perfume-reccomendation",
+  "version": "1.0.0",
+  "description": "Perfume Recommendation System - MySQL Database",
+  "main": "generate_seed.js",
+  "scripts": {
+    "dev": "concurrently \"cd backend && node server.js\" \"npx serve -p 3000 ./frontend\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdityaVoracpp/Perfume-DBMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AdityaVoracpp/Perfume-DBMS/issues"
+  },
+  "homepage": "https://github.com/AdityaVoracpp/Perfume-DBMS#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.4"
+  }
+}

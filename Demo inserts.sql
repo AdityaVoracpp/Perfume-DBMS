@@ -48,11 +48,11 @@ INSERT INTO Performance (perfume_id, longevity, sillage) VALUES
 (2, 'Beast', 'Enormous'),
 (3, 'Moderate', 'Soft');
 
--- 7. User
-INSERT INTO User (username, age, gender) VALUES 
-('john_doe', 25, 'Male'),
-('perfumeQueen', 30, 'Female'),
-('unisexFan', 22, 'Other');
+-- 7. Users
+INSERT INTO Users (username, email, password_hash, age, gender) VALUES 
+('john_doe', 'john@example.com', 'hashedpassword1', 25, 'Male'),
+('perfumeQueen', 'queen@example.com', 'hashedpassword2', 30, 'Female'),
+('unisexFan', 'fan@example.com', 'hashedpassword3', 22, 'Other');
 
 -- 8. Review
 INSERT INTO Review (perfume_id, user_id, rating, comment, review_date) VALUES 
