@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: perfume_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: PerfumeRecommendation
+      MYSQL_USER: perfume_user
+      MYSQL_PASSWORD: perfume_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init_db:/docker-entrypoint-initdb.d
+    restart: unless-stopped

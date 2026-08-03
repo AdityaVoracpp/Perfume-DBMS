@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfume Showcase DB</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ScentVault</div>
+        <div class="nav-links">
+            <a href="#" id="nav-dashboard">Dashboard</a>
+            <a href="#" id="nav-catalog">Catalog</a>
+            <a href="#" id="nav-login">Login</a>
+            <a href="#" id="nav-logout" class="hidden">Logout (<span id="current-user"></span>)</a>
+        </div>
+    </nav>
+
+    <main id="app-content">
+        <!-- Views will be injected here -->
+    </main>
+
+    <!-- Templates -->
+    <template id="tpl-dashboard">
+        <div class="dashboard-view fade-in">
+            <header class="hero">
+                <h1>Explore the World of Fragrances</h1>
+                <p>A minimalist database showcase for complex relationships.</p>
+            </header>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Perfumes</h3>
+                    <p class="stat-value" id="stat-perfumes">...</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Brands</h3>
+                    <p class="stat-value" id="stat-brands">...</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reviews</h3>
+                    <p class="stat-value" id="stat-reviews">...</p>
+                </div>
+            </div>
+
+            <h2>Latest Additions</h2>
+            <div class="grid" id="latest-grid">
+                <!-- Perfume cards -->
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-catalog">
+        <div class="catalog-view fade-in">
+            <h2>Catalog Search</h2>
+            <div class="search-filters">
+                <select id="filter-gender">
+                    <option value="">Any Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Unisex">Unisex</option>
+                </select>
+                <select id="filter-season">
+                    <option value="">Any Season</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Fall">Fall</option>
+                    <option value="Spring">Spring</option>
+                </select>
+                <select id="filter-category">
+                    <option value="">Any Category</option>
+                    <option value="Fresh">Fresh</option>
+                    <option value="Sweet">Sweet</option>
+                    <option value="Woody">Woody</option>
+                    <option value="Citrus">Citrus</option>
+                    <option value="Smoky">Smoky</option>
+                    <option value="Floral">Floral</option>
+                    <option value="Spicy">Spicy</option>
+                </select>
+                <button id="btn-search" class="btn-primary">Search</button>
+            </div>
+            <div class="grid" id="catalog-grid">
+                <!-- Perfume cards -->
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-perfume-card">
+        <div class="perfume-card">
+            <img src="" alt="" class="card-img">
+            <div class="card-content">
+                <span class="card-brand"></span>
+                <h3 class="card-title"></h3>
+                <div class="card-meta">
+                    <span class="meta-gender"></span>
+                    <span class="meta-price"></span>
+                </div>
+                <div class="card-rating"></div>
+                <button class="btn-secondary btn-view-details">View Details</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-detail">
+        <div class="detail-view fade-in">
+            <button class="btn-secondary" id="btn-back">← Back to Catalog</button>
+            <div class="detail-container">
+                <div class="detail-header">
+                    <img src="" alt="" id="detail-img">
+                    <div class="detail-info">
+                        <span id="detail-brand" class="badge brand-badge"></span>
+                        <h1 id="detail-title"></h1>
+                        <p id="detail-desc" class="description"></p>
+                        
+                        <div class="tags">
+                            <span class="tag tag-gender" id="detail-gender"></span>
+                            <span class="tag tag-year" id="detail-year"></span>
+                            <span class="tag tag-price" id="detail-price"></span>
+                        </div>
+                        
+                        <div class="performance-stats">
+                            <div class="p-stat"><strong>Longevity:</strong> <span id="detail-longevity"></span></div>
+                            <div class="p-stat"><strong>Sillage:</strong> <span id="detail-sillage"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-relationships">
+                    <div class="rel-box">
+                        <h3>Notes (M:N)</h3>
+                        <ul id="detail-notes" class="pill-list"></ul>
+                    </div>
+                    <div class="rel-box">
+                        <h3>Categories (M:N)</h3>
+                        <ul id="detail-categories" class="pill-list"></ul>
+                    </div>
+                    <div class="rel-box">
+                        <h3>Seasons (M:N)</h3>
+                        <ul id="detail-seasons" class="pill-list"></ul>
+                    </div>
+                </div>
+
+                <div class="reviews-section">
+                    <h3>Reviews (1:N)</h3>
+                    
+                    <div id="add-review-box" class="hidden">
+                        <h4>Add a Review</h4>
+                        <div class="review-form">
+                            <input type="number" id="review-rating" min="1" max="5" placeholder="Rating (1-5)">
+                            <textarea id="review-comment" placeholder="Your thoughts..."></textarea>
+                            <button id="btn-submit-review" class="btn-primary">Submit Review</button>
+                        </div>
+                        <p id="review-error" class="error-msg"></p>
+                    </div>
+                    <div id="login-prompt-review">
+                        <p>Please <a href="#" id="link-login-review">login</a> to add a review.</p>
+                    </div>
+
+                    <div id="reviews-list" class="reviews-list">
+                        <!-- Reviews -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-login">
+        <div class="auth-view fade-in">
+            <div class="auth-box">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" value="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" value="hashedpassword1">
+                </div>
+                <button id="btn-do-login" class="btn-primary full-width">Sign In</button>
+                <p id="login-error" class="error-msg"></p>
+                <p class="auth-switch">Demo Accounts: john@example.com (hashedpassword1), queen@example.com (hashedpassword2)</p>
+            </div>
+        </div>
+    </template>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

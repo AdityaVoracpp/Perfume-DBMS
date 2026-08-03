@@ -1,4 +1,4 @@
-CREATE DATABASE PerfumeRecommendation;
+CREATE DATABASE IF NOT EXISTS PerfumeRecommendation;
 USE PerfumeRecommendation;
 
 CREATE TABLE BrandType (
