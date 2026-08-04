@@ -44,7 +44,7 @@ sql += `INSERT INTO Brand (brand_name, origin_country, brand_type_id) VALUES \n`
 
 // 3. Perfume (50)
 let perfumes = [];
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 1000; i++) {
   let name = `${rand(baseNames)} ${rand(adjectives)}`;
   let brandId = randInt(1, brands.length);
   let gender = rand(genders);
@@ -61,7 +61,7 @@ sql += `INSERT INTO Note (note_name, note_type) VALUES \n` + notes.map(n => `('$
 
 // 5. PerfumeNote (Randomly assign 2-4 notes per perfume)
 let perfumeNotes = [];
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 1000; i++) {
   let numNotes = randInt(2, 4);
   let selectedNotes = new Set();
   while(selectedNotes.size < numNotes) { selectedNotes.add(randInt(1, notes.length)); }
@@ -71,7 +71,7 @@ sql += `INSERT INTO PerfumeNote (perfume_id, note_id) VALUES \n` + perfumeNotes.
 
 // 6. Performance
 let performances = [];
-for(let i = 1; i <= 50; i++) {
+for(let i = 1; i <= 1000; i++) {
   performances.push(`(${i}, '${rand(longevities)}', '${rand(sillages)}')`);
 }
 sql += `INSERT INTO Performance (perfume_id, longevity, sillage) VALUES \n` + performances.join(',\n') + `;\n\n`;
@@ -88,7 +88,7 @@ sql += `INSERT INTO Users (username, email, password_hash, age, gender) VALUES \
 
 // 8. Review (Random 0-3 reviews per perfume)
 let reviews = [];
-for(let i = 1; i <= 50; i++) {
+for(let i = 1; i <= 1000; i++) {
   let numReviews = randInt(0, 3);
   for(let j=0; j<numReviews; j++) {
     let uId = randInt(1, 5);
@@ -112,7 +112,7 @@ sql += `INSERT INTO Category (name) VALUES \n` + categories.map(c => `('${c}')`)
 
 // 12. PerfumeSeason
 let perfumeSeasons = [];
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 1000; i++) {
   let num = randInt(1, 2);
   let selected = new Set();
   while(selected.size < num) { selected.add(randInt(1, seasons.length)); }
@@ -122,7 +122,7 @@ sql += `INSERT INTO PerfumeSeason (perfume_id, season_id) VALUES \n` + perfumeSe
 
 // 13. PerfumeOccasion
 let perfumeOccasions = [];
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 1000; i++) {
   let num = randInt(1, 3);
   let selected = new Set();
   while(selected.size < num) { selected.add(randInt(1, occasions.length)); }
@@ -132,7 +132,7 @@ sql += `INSERT INTO PerfumeOccasion (perfume_id, occasion_id) VALUES \n` + perfu
 
 // 14. PerfumeCategory
 let perfumeCategories = [];
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 1000; i++) {
   let num = randInt(1, 2);
   let selected = new Set();
   while(selected.size < num) { selected.add(randInt(1, categories.length)); }
