@@ -16,6 +16,10 @@ const intentSchema = {
             items: { type: Type.STRING },
             description: "Notes the user specifically dislikes or wants to avoid."
         },
+        category: {
+            type: Type.STRING,
+            description: "The broad fragrance category. MUST be one of: 'Fresh', 'Sweet', 'Woody', 'Citrus', 'Smoky', 'Floral', 'Spicy', or '' if not specified."
+        },
         season: {
             type: Type.STRING,
             description: "A specific season if requested (e.g. Summer, Winter, Fall, Spring)."
@@ -48,7 +52,8 @@ async function generateSearchIntent(query) {
             const response = await ai.models.generateContent({
                 model: model,
                 contents: `Act as an expert perfumer. Extract the search intent from the user request.
-If the user asks for a specific vibe, occasion, or feeling (like 'drives girls crazy', 'date night', 'office', 'seductive', 'fresh'), you MUST use your expertise to reason and infer the appropriate perfume notes and add them to the 'include_notes' array.
+If the user asks for a specific vibe, occasion, or feeling (like 'drives girls crazy', 'date night', 'office', 'seductive', 'fresh', 'bakery'), you MUST use your expertise to reason and infer the appropriate perfume notes and add them to the 'include_notes' array.
+CRITICAL: If the user asks for a specific vibe (e.g. bakery/gourmand), identify contrasting notes that ruin that vibe (e.g. citrus, lavender, aquatic) and forcefully add them to the 'exclude_notes' array. Do this thoughtfully so you don't exclude complementary notes.
 CRITICAL: Pay close attention to who the WEARER is versus the TARGET AUDIENCE to deduce the correct gender. For example, if a user wants to 'attract women', the wearer is Male.
 Provide a conversational 'rationale' explaining why you chose these parameters.
 Query: "${query}"`,
@@ -72,12 +77,14 @@ Query: "${query}"`,
 
 async function executeDynamicQuery(intent) {
     let query = `
-        SELECT DISTINCT p.* 
+        SELECT p.* 
         FROM Perfume p
         LEFT JOIN PerfumeNote pn ON p.perfume_id = pn.perfume_id
         LEFT JOIN Note n ON pn.note_id = n.note_id
         LEFT JOIN PerfumeSeason ps ON p.perfume_id = ps.perfume_id
         LEFT JOIN Season s ON ps.season_id = s.season_id
+        LEFT JOIN PerfumeCategory pc ON p.perfume_id = pc.perfume_id
+        LEFT JOIN Category c ON pc.category_id = c.category_id
         WHERE 1=1
     `;
     const params = [];
@@ -94,6 +101,11 @@ async function executeDynamicQuery(intent) {
     if (intent.season) {
         query += ` AND LOWER(s.name) = LOWER(?)`;
         params.push(intent.season);
+    }
+    
+    if (intent.category && intent.category !== '') {
+        query += ` AND LOWER(c.name) = LOWER(?)`;
+        params.push(intent.category);
     }
 
     if (intent.include_notes && intent.include_notes.length > 0) {
@@ -113,7 +125,7 @@ async function executeDynamicQuery(intent) {
         intent.exclude_notes.forEach(note => params.push(`%${note.toLowerCase()}%`));
     }
 
-    query += ` LIMIT 5`;
+    query += ` GROUP BY p.perfume_id ORDER BY COUNT(DISTINCT n.note_id) DESC LIMIT 5`;
 
     try {
         const [rows] = await db.query(query, params);
