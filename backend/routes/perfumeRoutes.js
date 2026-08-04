@@ -81,17 +81,28 @@ router.get('/search', async (req, res) => {
       queryParams.push(note);
     }
 
+    let countQuery = `
+      SELECT COUNT(DISTINCT p.perfume_id) as total
+      FROM Perfume p
+      LEFT JOIN Brand b ON p.brand_id = b.brand_id
+    `;
+    if (joins.length > 0) countQuery += ' ' + joins.join(' ');
+    if (whereClauses.length > 0) countQuery += ' WHERE ' + whereClauses.join(' AND ');
+
     if (joins.length > 0) baseQuery += ' ' + joins.join(' ');
     if (whereClauses.length > 0) baseQuery += ' WHERE ' + whereClauses.join(' AND ');
 
     baseQuery += ' GROUP BY p.perfume_id ';
-    baseQuery += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
+    baseQuery += ' ORDER BY p.perfume_id ASC LIMIT ? OFFSET ?';
     
+    // Get total count
+    const [countResult] = await pool.query(countQuery, queryParams);
+    const totalCount = countResult[0].total;
+
     queryParams.push(Number(limit), Number(offset));
 
-    // Using query() instead of execute() to avoid mysqld_stmt_execute strict type issues with LIMIT/OFFSET
     const [results] = await pool.query(baseQuery, queryParams);
-    res.json({ results, page: Number(page), limit: Number(limit) });
+    res.json({ results, page: Number(page), limit: Number(limit), total: totalCount, totalPages: Math.ceil(totalCount / limit) });
 
   } catch (error) {
     console.error('Search error:', error);

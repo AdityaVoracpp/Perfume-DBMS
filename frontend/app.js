@@ -113,19 +113,43 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTemplate('tpl-catalog');
     
     let currentNoteFilter = initialParams ? initialParams.note : null;
+    let currentPage = 1;
+    const limit = 20;
 
-    document.getElementById('btn-search').addEventListener('click', async () => {
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnNext = document.getElementById('btn-next-page');
+    const pageInfo = document.getElementById('page-info');
+
+    const getSearchParams = () => {
       const gender = document.getElementById('filter-gender').value;
       const season = document.getElementById('filter-season').value;
       const category = document.getElementById('filter-category').value;
       
-      const params = {};
+      const params = { page: currentPage, limit };
       if (gender) params.gender = gender;
       if (season) params.season = season;
       if (category) params.category = category;
       if (currentNoteFilter) params.note = currentNoteFilter;
+      return params;
+    };
 
-      await doSearch(params);
+    document.getElementById('btn-search').addEventListener('click', async () => {
+      currentPage = 1; // Reset to page 1 on new search
+      await doSearch(getSearchParams());
+    });
+
+    btnPrev.addEventListener('click', async () => {
+      if (currentPage > 1) {
+        currentPage--;
+        await doSearch(getSearchParams());
+        window.scrollTo(0, 0);
+      }
+    });
+
+    btnNext.addEventListener('click', async () => {
+      currentPage++;
+      await doSearch(getSearchParams());
+      window.scrollTo(0, 0);
     });
 
     if (initialParams) {
@@ -133,23 +157,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const catFilter = document.getElementById('filter-category');
         if (catFilter) catFilter.value = initialParams.category;
       }
-      await doSearch(initialParams);
+      await doSearch(getSearchParams());
     } else {
-      await doSearch({});
+      await doSearch(getSearchParams());
     }
   }
 
   async function doSearch(params) {
     const grid = document.getElementById('catalog-grid');
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnNext = document.getElementById('btn-next-page');
+    const pageInfo = document.getElementById('page-info');
+    
     grid.innerHTML = '<p>Loading...</p>';
     
     try {
       const data = await api.searchPerfumes(params);
       grid.innerHTML = '';
+      
       if (data.results.length === 0) {
         grid.innerHTML = '<p>No perfumes found matching these criteria.</p>';
+        btnPrev.style.visibility = 'hidden';
+        btnNext.style.visibility = 'hidden';
+        pageInfo.textContent = 'Page 0 of 0';
         return;
       }
+      
+      pageInfo.textContent = `Page ${data.page} of ${data.totalPages || 1}`;
+      btnPrev.style.visibility = data.page > 1 ? 'visible' : 'hidden';
+      btnNext.style.visibility = data.page < (data.totalPages || 1) ? 'visible' : 'hidden';
       
       data.results.forEach(p => {
         grid.appendChild(createPerfumeCard(p));
