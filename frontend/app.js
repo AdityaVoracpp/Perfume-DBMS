@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nav-dashboard').addEventListener('click', () => loadDashboard());
   document.getElementById('nav-catalog').addEventListener('click', () => loadCatalog());
   document.getElementById('nav-login').addEventListener('click', () => loadLogin());
+  document.getElementById('nav-register').addEventListener('click', () => loadRegister());
   document.getElementById('nav-logout').addEventListener('click', () => {
     api.setToken(null);
     currentUser = null;
@@ -16,15 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateNav() {
     const navLogin = document.getElementById('nav-login');
+    const navRegister = document.getElementById('nav-register');
     const navLogout = document.getElementById('nav-logout');
     const userSpan = document.getElementById('current-user');
     
     if (api.getToken() && currentUser) {
       navLogin.classList.add('hidden');
+      if (navRegister) navRegister.classList.add('hidden');
       navLogout.classList.remove('hidden');
       userSpan.textContent = currentUser.username;
     } else {
       navLogin.classList.remove('hidden');
+      if (navRegister) navRegister.classList.remove('hidden');
       navLogout.classList.add('hidden');
     }
   }
@@ -46,9 +50,58 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('stat-brands').textContent = data.stats.total_brands;
       document.getElementById('stat-reviews').textContent = data.stats.total_reviews;
 
-      const grid = document.getElementById('latest-grid');
-      data.latestPerfumes.forEach(p => {
-        grid.appendChild(createPerfumeCard(p));
+      const categoryCtx = document.getElementById('category-chart').getContext('2d');
+      new Chart(categoryCtx, {
+        type: 'pie',
+        data: {
+          labels: data.categoryData.map(c => c.name),
+          datasets: [{
+            data: data.categoryData.map(c => c.count),
+            backgroundColor: [
+              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#E7E9ED'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const label = data.categoryData[index].name;
+              loadCatalog({ category: label });
+            }
+          }
+        }
+      });
+
+      const noteCtx = document.getElementById('note-chart').getContext('2d');
+      new Chart(noteCtx, {
+        type: 'pie',
+        data: {
+          labels: data.noteData.map(n => n.note_name),
+          datasets: [{
+            data: data.noteData.map(n => n.count),
+            backgroundColor: [
+              '#FF9F40', '#9966FF', '#4BC0C0', '#FFCE56', '#36A2EB', '#FF6384', '#C9CBCF', '#E7E9ED', '#8B008B', '#00FA9A'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const label = data.noteData[index].note_name;
+              loadCatalog({ note: label });
+            }
+          }
+        }
       });
     } catch (err) {
       console.error(err);
@@ -56,9 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function loadCatalog() {
+  async function loadCatalog(initialParams = null) {
     renderTemplate('tpl-catalog');
     
+    let currentNoteFilter = initialParams ? initialParams.note : null;
+
     document.getElementById('btn-search').addEventListener('click', async () => {
       const gender = document.getElementById('filter-gender').value;
       const season = document.getElementById('filter-season').value;
@@ -68,11 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (gender) params.gender = gender;
       if (season) params.season = season;
       if (category) params.category = category;
+      if (currentNoteFilter) params.note = currentNoteFilter;
 
       await doSearch(params);
     });
 
-    await doSearch({});
+    if (initialParams) {
+      if (initialParams.category) {
+        const catFilter = document.getElementById('filter-category');
+        if (catFilter) catFilter.value = initialParams.category;
+      }
+      await doSearch(initialParams);
+    } else {
+      await doSearch({});
+    }
   }
 
   async function doSearch(params) {
@@ -221,9 +285,49 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMsg.textContent = err.error || 'Login failed';
       }
     });
+
+    const registerLink = document.getElementById('link-to-register');
+    if (registerLink) {
+      registerLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadRegister();
+      });
+    }
+  }
+
+  function loadRegister() {
+    renderTemplate('tpl-register');
+    
+    document.getElementById('link-to-login').addEventListener('click', (e) => {
+      e.preventDefault();
+      loadLogin();
+    });
+
+    document.getElementById('btn-do-register').addEventListener('click', async () => {
+      const username = document.getElementById('reg-username').value;
+      const email = document.getElementById('reg-email').value;
+      const pass = document.getElementById('reg-password').value;
+      const age = document.getElementById('reg-age').value;
+      const gender = document.getElementById('reg-gender').value;
+      const errorMsg = document.getElementById('reg-error');
+      
+      try {
+        await api.register({ username, email, password: pass, age: age ? parseInt(age) : null, gender: gender || null });
+        // Auto login after successful registration
+        const data = await api.login(email, pass);
+        api.setToken(data.token);
+        currentUser = data.user;
+        updateNav();
+        
+        loadDashboard();
+      } catch (err) {
+        errorMsg.textContent = err.error || 'Registration failed';
+      }
+    });
   }
 
   // Init
+  window.app = { loadDetail, loadCatalog };
   updateNav();
   loadDashboard();
 });

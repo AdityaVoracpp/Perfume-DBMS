@@ -13,15 +13,24 @@ router.get('/dashboard', async (req, res) => {
         (SELECT COUNT(*) FROM Review) AS total_reviews
     `);
 
-    const [latestPerfumes] = await pool.execute(`
-      SELECT p.perfume_id, p.name, p.image_url, p.created_at, b.brand_name
-      FROM Perfume p
-      LEFT JOIN Brand b ON p.brand_id = b.brand_id
-      ORDER BY p.created_at DESC
-      LIMIT 5
+    const [categoryData] = await pool.execute(`
+      SELECT c.name, COUNT(pc.perfume_id) as count
+      FROM Category c
+      JOIN PerfumeCategory pc ON c.category_id = pc.category_id
+      GROUP BY c.name
+      ORDER BY count DESC
     `);
 
-    res.json({ stats: counts[0], latestPerfumes });
+    const [noteData] = await pool.execute(`
+      SELECT n.note_name, COUNT(pn.perfume_id) as count
+      FROM Note n
+      JOIN PerfumeNote pn ON n.note_id = pn.note_id
+      GROUP BY n.note_name
+      ORDER BY count DESC
+      LIMIT 10
+    `);
+
+    res.json({ stats: counts[0], categoryData, noteData });
   } catch (error) {
     console.error('Dashboard error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -31,7 +40,7 @@ router.get('/dashboard', async (req, res) => {
 // Catalog / Advanced Search
 router.get('/search', async (req, res) => {
   try {
-    const { gender, season, category, page = 1, limit = 10 } = req.query;
+    const { gender, season, category, note, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
     let baseQuery = `
@@ -63,6 +72,13 @@ router.get('/search', async (req, res) => {
       joins.push('JOIN Category c ON pc.category_id = c.category_id');
       whereClauses.push('c.name = ?');
       queryParams.push(category);
+    }
+
+    if (note) {
+      joins.push('JOIN PerfumeNote pn ON p.perfume_id = pn.perfume_id');
+      joins.push('JOIN Note n ON pn.note_id = n.note_id');
+      whereClauses.push('n.note_name = ?');
+      queryParams.push(note);
     }
 
     if (joins.length > 0) baseQuery += ' ' + joins.join(' ');
