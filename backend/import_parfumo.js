@@ -165,7 +165,7 @@ async function runImport() {
         // Start scraping script in background
         console.log('Starting image scraping automatically in the background...');
         const { spawn } = require('child_process');
-        const scraper = spawn('node', ['scrape_images.js'], { detached: true, stdio: 'ignore' });
+        const scraper = spawn('node', ['backend/scrape_images.js'], { detached: true, stdio: 'ignore' });
         scraper.unref();
         
         process.exit(0);
