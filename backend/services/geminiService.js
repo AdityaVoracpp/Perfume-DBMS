@@ -23,6 +23,10 @@ const intentSchema = {
         gender: {
             type: Type.STRING,
             description: "Gender preference if requested (e.g. Male, Female, Unisex)."
+        },
+        rationale: {
+            type: Type.STRING,
+            description: "A friendly 1-2 sentence explanation of WHY you chose these specific notes and gender based on the user's vibe/request. Act as a perfume expert."
         }
     }
 };
@@ -43,7 +47,11 @@ async function generateSearchIntent(query) {
         try {
             const response = await ai.models.generateContent({
                 model: model,
-                contents: `Extract the perfume search intent from the following user request. Do not make up notes, just extract what the user is asking for: "${query}"`,
+                contents: `Act as an expert perfumer. Extract the search intent from the user request.
+If the user asks for a specific vibe, occasion, or feeling (like 'drives girls crazy', 'date night', 'office', 'seductive', 'fresh'), you MUST use your expertise to reason and infer the appropriate perfume notes and add them to the 'include_notes' array.
+CRITICAL: Pay close attention to who the WEARER is versus the TARGET AUDIENCE to deduce the correct gender. For example, if a user wants to 'attract women', the wearer is Male.
+Provide a conversational 'rationale' explaining why you chose these parameters.
+Query: "${query}"`,
                 config: {
                     responseMimeType: 'application/json',
                     responseSchema: intentSchema,
@@ -105,7 +113,7 @@ async function executeDynamicQuery(intent) {
         intent.exclude_notes.forEach(note => params.push(`%${note.toLowerCase()}%`));
     }
 
-    query += ` LIMIT 10`;
+    query += ` LIMIT 5`;
 
     try {
         const [rows] = await db.query(query, params);
