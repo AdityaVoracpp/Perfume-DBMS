@@ -4,6 +4,8 @@
   "description": "Perfume Recommendation System - MySQL Database",
   "main": "generate_seed.js",
   "scripts": {
+    "start": "node backend/server.js",
+    "build": "cd backend && npm install",
     "dev": "concurrently \"cd backend && node server.js\" \"npx serve -p 3000 ./frontend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
