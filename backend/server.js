@@ -30,7 +30,6 @@ app.get('/api/seed', async (req, res) => {
   const fs = require('fs');
   const path = require('path');
   const mysql = require('mysql2/promise');
-  const { execSync } = require('child_process');
 
   try {
     const connection = await mysql.createConnection({
@@ -45,20 +44,16 @@ app.get('/api/seed', async (req, res) => {
         multipleStatements: true
     });
 
-    let schemaSql = fs.readFileSync(path.join(__dirname, '../Schema.sql'), 'utf8');
-    schemaSql = schemaSql.replace(/CREATE DATABASE .*;/g, '');
-    schemaSql = schemaSql.replace(/USE .*;/g, '');
-    await connection.query(schemaSql);
+    let seedSql = fs.readFileSync(path.join(__dirname, '../init_db/real_seed.sql'), 'utf8');
+    
+    // Quick cleanup to drop tables first if needed, though dump handles it
+    await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
+    await connection.query(seedSql);
+    await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     connection.end();
 
-    // Run the actual CSV importer asynchronously so the request doesn't timeout
-    exec('node backend/import_parfumo.js', { cwd: path.join(__dirname, '../') }, (error, stdout, stderr) => {
-        if (error) console.error("Importer error:", error);
-        if (stdout) console.log("Importer output:", stdout);
-    });
-
-    res.send('<h1>Database Seeding Started!</h1><p>The server is downloading the CSV and populating the database with 1000 real perfumes in the background. It will also download images. Check the dashboard in about 30 seconds!</p><p>You can remove this route now.</p>');
+    res.send('<h1>Database Seeded Successfully!</h1><p>The real database dump (including 1000 scraped perfumes and images) was restored successfully. Check the dashboard!</p><p>You can remove this route now.</p>');
   } catch (err) {
     console.error(err);
     res.status(500).send('Error starting seeding: ' + err.message);
