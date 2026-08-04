@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const appContent = document.getElementById('app-content');
-  let currentUser = null;
+  let currentUser = api.getCurrentUser();
   let currentPerfumeId = null;
 
   // Navigation
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nav-register').addEventListener('click', () => loadRegister());
   document.getElementById('nav-logout').addEventListener('click', () => {
     api.setToken(null);
+    api.setCurrentUser(null);
     currentUser = null;
     updateNav();
     loadDashboard();
@@ -124,11 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const gender = document.getElementById('filter-gender').value;
       const season = document.getElementById('filter-season').value;
       const category = document.getElementById('filter-category').value;
+      const sort = document.getElementById('filter-sort').value;
       
       const params = { page: currentPage, limit };
       if (gender) params.gender = gender;
       if (season) params.season = season;
       if (category) params.category = category;
+      if (sort) params.sort = sort;
       if (currentNoteFilter) params.note = currentNoteFilter;
       return params;
     };
@@ -241,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderReviews(p.reviews || []);
 
       // Auth state for review form
-      if (api.getToken()) {
+      if (api.getToken() && currentUser) {
         document.getElementById('add-review-box').classList.remove('hidden');
         document.getElementById('login-prompt-review').classList.add('hidden');
         
@@ -309,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const data = await api.login(email, pass);
         api.setToken(data.token);
+        api.setCurrentUser(data.user);
         currentUser = data.user;
         updateNav();
         
@@ -352,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto login after successful registration
         const data = await api.login(email, pass);
         api.setToken(data.token);
+        api.setCurrentUser(data.user);
         currentUser = data.user;
         updateNav();
         
