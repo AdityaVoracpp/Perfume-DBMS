@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
             removeMessage(loadingId);
 
             if (data.success && data.recommendations && data.recommendations.length > 0) {
-                let resultHtml = `<p>I found ${data.recommendations.length} recommendations based on your intent: <strong>${JSON.stringify(data.intent)}</strong></p>`;
+                const rationaleText = data.intent.rationale || `I found ${data.recommendations.length} recommendations for you.`;
+                let resultHtml = `<p style="margin-bottom: 0.5rem; color: #555;"><em>"${rationaleText}"</em></p>`;
                 resultHtml += `<div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.5rem;">`;
                 
                 data.recommendations.forEach(perfume => {
@@ -67,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 addMessage(resultHtml, 'system', false, true);
             } else if (data.success) {
-                addMessage(`I couldn't find any perfumes matching exactly what you asked for. Try broadening your criteria! (Extracted intent: ${JSON.stringify(data.intent)})`, 'system');
+                const rationaleText = data.intent.rationale || "I couldn't find any perfumes matching exactly what you asked for.";
+                addMessage(`<p style="margin-bottom: 0.5rem; color: #555;"><em>"${rationaleText}"</em></p><p>Unfortunately, I couldn't find any exact matches in our database. Try broadening your search!</p>`, 'system', false, true);
             } else {
                 addMessage('Sorry, there was an error processing your request.', 'system');
             }
