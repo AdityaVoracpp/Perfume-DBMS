@@ -1,5 +1,3 @@
-CREATE DATABASE PerfumeRecommendation;
-USE PerfumeRecommendation;
 
 CREATE TABLE BrandType (
   brand_type_id INT PRIMARY KEY AUTO_INCREMENT,

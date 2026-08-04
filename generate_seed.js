@@ -34,7 +34,7 @@ const sillages = ['Soft', 'Moderate', 'Heavy', 'Enormous'];
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-let sql = `USE PerfumeRecommendation;\n\n`;
+let sql = ``;
 
 // 1. BrandType
 sql += `INSERT INTO BrandType (type_name) VALUES \n` + brandTypes.map(b => `('${b}')`).join(',\n') + `;\n\n`;
