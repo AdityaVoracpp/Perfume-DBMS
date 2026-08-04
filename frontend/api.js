@@ -11,6 +11,19 @@ const api = {
     }
   },
 
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  setCurrentUser: (user) => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  },
+
   async request(endpoint, options = {}) {
     const token = this.getToken();
     

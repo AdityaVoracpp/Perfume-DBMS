@@ -10,7 +10,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">ScentVault</div>
+        <div class="logo">Scent Browser</div>
         <div class="nav-links">
             <a href="#" id="nav-dashboard">Dashboard</a>
             <a href="#" id="nav-catalog">Catalog</a>
@@ -29,7 +29,6 @@
         <div class="dashboard-view fade-in">
             <header class="hero">
                 <h1>Explore the World of Fragrances</h1>
-                <p>A minimalist database showcase for complex relationships.</p>
             </header>
             
             <div class="stats-container">
@@ -87,6 +86,14 @@
                     <option value="Floral">Floral</option>
                     <option value="Spicy">Spicy</option>
                 </select>
+                <select id="filter-sort">
+                    <option value="">Sort By...</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="popularity_desc">Popularity: High to Low</option>
+                    <option value="reviews_desc">Most Reviews</option>
+                    <option value="rating_desc">Highest Rated</option>
+                </select>
                 <button id="btn-search" class="btn-primary">Search</button>
             </div>
             <div class="grid" id="catalog-grid">
@@ -142,21 +149,21 @@
 
                 <div class="detail-relationships">
                     <div class="rel-box">
-                        <h3>Notes (M:N)</h3>
+                        <h3>Notes</h3>
                         <ul id="detail-notes" class="pill-list"></ul>
                     </div>
                     <div class="rel-box">
-                        <h3>Categories (M:N)</h3>
+                        <h3>Categories</h3>
                         <ul id="detail-categories" class="pill-list"></ul>
                     </div>
                     <div class="rel-box">
-                        <h3>Seasons (M:N)</h3>
+                        <h3>Seasons</h3>
                         <ul id="detail-seasons" class="pill-list"></ul>
                     </div>
                 </div>
 
                 <div class="reviews-section">
-                    <h3>Reviews (1:N)</h3>
+                    <h3>Reviews</h3>
                     
                     <div id="add-review-box" class="hidden">
                         <h4>Add a Review</h4>
@@ -185,15 +192,14 @@
                 <h2>Login</h2>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" id="login-email" value="john@example.com">
+                    <input type="email" id="login-email" placeholder="john@example.com">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="login-password" value="hashedpassword1">
+                    <input type="password" id="login-password" placeholder="Password">
                 </div>
                 <button id="btn-do-login" class="btn-primary full-width">Sign In</button>
                 <p id="login-error" class="error-msg"></p>
-                <p class="auth-switch">Demo Accounts: john@example.com (hashedpassword1), queen@example.com (hashedpassword2)</p>
                 <p class="auth-switch">Don't have an account? <a href="#" id="link-to-register">Register</a></p>
             </div>
         </div>
@@ -236,16 +242,16 @@
         </div>
     </template>
 
-    <!-- AI Sommelier Widget -->
+    <!-- AI Fragrance Guide Widget -->
     <div id="ai-chat-widget" class="ai-widget">
         <div id="ai-chat-popup" class="ai-chat-popup hidden fade-in">
             <div class="ai-chat-header">
-                <h3>✨ AI Sommelier</h3>
+                <h3>✨ AI Fragrance Guide</h3>
                 <button id="ai-close-btn" class="ai-close">&times;</button>
             </div>
             <div class="ai-chat-body" id="ai-chat-body">
                 <div class="ai-message system">
-                    Hi! I'm your AI Perfume Sommelier. Tell me what kind of fragrance you're looking for! (e.g. "A fresh, woody winter scent")
+                    Hi! What fragrance are you looking for today? Describe a vibe, occasion, or notes you love!
                 </div>
             </div>
             <div class="ai-chat-footer">

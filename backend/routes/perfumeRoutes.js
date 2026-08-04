@@ -40,7 +40,7 @@ router.get('/dashboard', async (req, res) => {
 // Catalog / Advanced Search
 router.get('/search', async (req, res) => {
   try {
-    const { gender, season, category, note, page = 1, limit = 10 } = req.query;
+    const { gender, season, category, note, sort, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
     let baseQuery = `
@@ -93,7 +93,21 @@ router.get('/search', async (req, res) => {
     if (whereClauses.length > 0) baseQuery += ' WHERE ' + whereClauses.join(' AND ');
 
     baseQuery += ' GROUP BY p.perfume_id ';
-    baseQuery += ' ORDER BY p.perfume_id ASC LIMIT ? OFFSET ?';
+
+    let orderByClause = 'ORDER BY p.perfume_id ASC';
+    if (sort === 'price_asc') {
+      orderByClause = 'ORDER BY p.price ASC, p.perfume_id ASC';
+    } else if (sort === 'price_desc') {
+      orderByClause = 'ORDER BY p.price DESC, p.perfume_id ASC';
+    } else if (sort === 'popularity_desc') {
+      orderByClause = 'ORDER BY review_count DESC, avg_rating DESC, p.perfume_id ASC';
+    } else if (sort === 'reviews_desc') {
+      orderByClause = 'ORDER BY review_count DESC, p.perfume_id ASC';
+    } else if (sort === 'rating_desc') {
+      orderByClause = 'ORDER BY avg_rating DESC, p.perfume_id ASC';
+    }
+
+    baseQuery += ` ${orderByClause} LIMIT ? OFFSET ?`;
     
     // Get total count
     const [countResult] = await pool.query(countQuery, queryParams);
