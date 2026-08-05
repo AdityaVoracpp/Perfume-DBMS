@@ -1,13 +1,34 @@
 const express = require('express');
 const router = express.Router();
 const geminiService = require('../services/geminiService');
+const jwt = require('jsonwebtoken');
+const pool = require('../db');
+const { JWT_SECRET } = require('../middleware/authMiddleware');
 
 // POST /api/ai/recommend
 router.post('/recommend', async (req, res) => {
-    const { query, userGender } = req.body;
+    let { query, userGender } = req.body;
     
     if (!query) {
         return res.status(400).json({ error: 'Missing query parameter.' });
+    }
+
+    // If userGender was not passed in body, try extracting from Authorization header token
+    if (!userGender && req.headers.authorization) {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            if (token) {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                if (decoded && decoded.userId) {
+                    const [users] = await pool.execute('SELECT gender FROM Users WHERE user_id = ?', [decoded.userId]);
+                    if (users.length > 0 && users[0].gender) {
+                        userGender = users[0].gender;
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('Could not extract user gender from auth token:', err.message);
+        }
     }
 
     try {

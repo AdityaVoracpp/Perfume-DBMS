@@ -31,12 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingId = addMessage('Analyzing your request...', 'system', true);
 
         try {
-            const userGender = window.app && window.app.currentUser ? window.app.currentUser.gender : null;
+            const currentUser = window.api ? window.api.getCurrentUser() : (window.app ? window.app.currentUser : null);
+            const userGender = currentUser ? currentUser.gender : null;
+            const token = window.api ? window.api.getToken() : null;
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await fetch('/api/ai/recommend', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 body: JSON.stringify({ query, userGender })
             });
 

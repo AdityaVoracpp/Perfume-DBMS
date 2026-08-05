@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Init
-  window.app = { loadDetail, loadCatalog };
+  window.app = { loadDetail, loadCatalog, get currentUser() { return currentUser; } };
   updateNav();
   loadDashboard();
 });
