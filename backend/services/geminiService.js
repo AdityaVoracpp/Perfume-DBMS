@@ -44,17 +44,28 @@ const FALLBACK_MODELS = [
   'gemini-2.5-flash'       // 20 RPD limit
 ];
 
-async function generateSearchIntent(query) {
+async function generateSearchIntent(query, userGender = null) {
     let lastError = null;
+    const userContext = userGender ? `User Profile Gender: ${userGender}\n` : '';
     
     for (const model of FALLBACK_MODELS) {
         try {
             const response = await ai.models.generateContent({
                 model: model,
                 contents: `Act as an expert perfumer. Extract the search intent from the user request.
+${userContext}
+RULES FOR GENDER & TARGET WEARER:
+1. EXPLICIT RECIPIENT / GENDER IN PROMPT OVERRIDES EVERYTHING:
+   - If the prompt is explicitly for a female recipient or feminine scent (e.g., 'for my girlfriend', 'for my wife', 'feminine scent', 'perfume for women', 'for her'), set 'gender' to 'Female'.
+   - If the prompt is explicitly for a male recipient or masculine scent (e.g., 'for my boyfriend', 'for my husband', 'masculine scent', 'perfume for men', 'for him'), set 'gender' to 'Male'.
+2. WEARER vs TARGET AUDIENCE:
+   - If a male user asks for something to 'attract women' or 'drives girls crazy' for HIMSELF to wear, the wearer is Male, so set 'gender' to 'Male'.
+3. DEFAULT TO USER PROFILE GENDER:
+   - If no recipient or specific gender/vibe is mentioned in the prompt, default the 'gender' field to the User Profile Gender (if Male or Female).
+   - If profile gender is 'Other' or not specified and prompt is ungendered, set 'gender' to '' (empty string).
+
 If the user asks for a specific vibe, occasion, or feeling (like 'drives girls crazy', 'date night', 'office', 'seductive', 'fresh', 'bakery'), you MUST use your expertise to reason and infer the appropriate perfume notes and add them to the 'include_notes' array.
 CRITICAL: If the user asks for a specific vibe (e.g. bakery/gourmand), identify contrasting notes that ruin that vibe (e.g. citrus, lavender, aquatic) and forcefully add them to the 'exclude_notes' array. Do this thoughtfully so you don't exclude complementary notes.
-CRITICAL: Pay close attention to who the WEARER is versus the TARGET AUDIENCE to deduce the correct gender. For example, if a user wants to 'attract women', the wearer is Male.
 Provide a conversational 'rationale' explaining why you chose these parameters.
 Query: "${query}"`,
                 config: {

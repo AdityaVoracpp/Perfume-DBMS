@@ -31,12 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingId = addMessage('Analyzing your request...', 'system', true);
 
         try {
-            const response = await fetch('http://localhost:5000/api/ai/recommend', {
+            const userGender = window.app && window.app.currentUser ? window.app.currentUser.gender : null;
+            const response = await fetch('/api/ai/recommend', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({ query, userGender })
             });
 
             const data = await response.json();

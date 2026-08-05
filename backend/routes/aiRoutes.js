@@ -4,7 +4,7 @@ const geminiService = require('../services/geminiService');
 
 // POST /api/ai/recommend
 router.post('/recommend', async (req, res) => {
-    const { query } = req.body;
+    const { query, userGender } = req.body;
     
     if (!query) {
         return res.status(400).json({ error: 'Missing query parameter.' });
@@ -12,7 +12,7 @@ router.post('/recommend', async (req, res) => {
 
     try {
         // Step 1: Agentic Intent Extraction
-        const intent = await geminiService.generateSearchIntent(query);
+        const intent = await geminiService.generateSearchIntent(query, userGender);
         console.log("Extracted Intent:", intent);
 
         // Step 2: Dynamic Database Querying
