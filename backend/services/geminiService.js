@@ -90,12 +90,14 @@ async function executeDynamicQuery(intent) {
     const params = [];
 
     if (intent.gender) {
-        // Simple heuristic to match enum values
         const normalizedGender = intent.gender.charAt(0).toUpperCase() + intent.gender.slice(1).toLowerCase();
-        if (['Male', 'Female', 'Unisex'].includes(normalizedGender)) {
-            query += ` AND p.gender = ?`;
+        if (['Male', 'Female'].includes(normalizedGender)) {
+            query += ` AND (p.gender = ? OR p.gender = 'Unisex')`;
             params.push(normalizedGender);
+        } else if (normalizedGender === 'Unisex') {
+            query += ` AND p.gender = 'Unisex'`;
         }
+        // 'Other' or any other value -> recommend all perfumes
     }
 
     if (intent.season) {

@@ -56,8 +56,17 @@ router.get('/search', async (req, res) => {
     let queryParams = [];
 
     if (gender) {
-      whereClauses.push('p.gender = ?');
-      queryParams.push(gender);
+      if (gender === 'Male' || gender === 'Female') {
+        whereClauses.push('(p.gender = ? OR p.gender = "Unisex")');
+        queryParams.push(gender);
+      } else if (gender === 'Unisex') {
+        whereClauses.push('p.gender = "Unisex"');
+      } else if (gender === 'Other') {
+        // Recommend all perfumes for 'Other' (no gender filter)
+      } else {
+        whereClauses.push('p.gender = ?');
+        queryParams.push(gender);
+      }
     }
 
     if (season) {
